@@ -1,0 +1,19 @@
+1. Trạng thái Zombie
+
+Lý do xuất hiện:
+Một tiến trình con sau khi kết thúc (gọi exit()) sẽ trả về cho hệ thống một exit status (mã thoát và thông tin thống kê).
+Thông tin này cần được tiến trình cha thu lại thông qua wait() hoặc waitpid().
+Trong thời gian chờ cha thu nhận, hệ thống vẫn giữ lại entry của tiến trình con trong bảng tiến trình → tiến trình con lúc này ở trạng thái Zombie (ký hiệu Z hoặc <defunct>).
+
+Ý nghĩa: Trạng thái Zombie đảm bảo tiến trình cha có thể đọc được mã thoát và lý do kết thúc của tiến trình con.Zombie không chiếm CPU hay RAM đáng kể (chỉ giữ entry nhỏ trong bảng tiến trình).
+Tuy nhiên, nếu tiến trình cha không bao giờ thu dọn (không gọi wait()), nhiều zombie sẽ tích tụ, chiếm hết entry trong bảng tiến trình và có thể gây tắc nghẽn hệ thống (không tạo được tiến trình mới).
+
+2. Trạng thái Orphan
+
+Tại sao xuất hiện:Khi một tiến trình cha kết thúc trước tiến trình con, con vẫn đang chạy → lúc này nó trở thành Orphan (mồ côi).Hệ điều hành (Linux) sẽ tái gán (reparent) tiến trình con cho một tiến trình khác, thường là init (PID 1) hoặc systemd, để đảm bảo con vẫn có một tiến trình cha hợp lệ.
+
+Ý nghĩa :Trạng thái Orphan không nguy hiểm. Ngược lại, nó cho thấy cơ chế quản lý tiến trình chặt chẽ của Linux: luôn có một “cha nuôi” để đảm bảo rằng khi tiến trình Orphan kết thúc, sẽ có người thu dọn (không bị biến thành zombie vĩnh viễn).Cơ chế này còn được sử dụng có chủ đích trong kỹ thuật double-fork để tạo tiến trình daemon.
+
+3. Tóm lại
+Zombie: là tiến trình đã chết nhưng vẫn giữ lại “xác” trong bảng tiến trình để cha đọc thông tin. Nếu cha bỏ mặc, nó gây rác và có thể làm hệ thống quá tải.
+Orphan: là tiến trình còn sống nhưng mất cha. Linux sẽ tự động giao nó cho init/systemd để quản lý, vì thế nó không gây hại cho hệ thống.
