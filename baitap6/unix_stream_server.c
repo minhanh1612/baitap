@@ -14,7 +14,6 @@ int main() {
     char buffer[BUFFER_SIZE] = {0};
     const char *hello = "Hello from server";
 
-    // Xóa file socket cũ nếu tồn tại
     unlink(SOCKET_PATH);
 
     if ((server_fd = socket(AF_UNIX, SOCK_STREAM, 0)) == 0) {

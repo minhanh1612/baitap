@@ -16,13 +16,11 @@ int main() {
     char buffer[BUFFER_SIZE] = {0};
     const char *hello = "Hello from server";
 
-    // Tạo socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         perror("socket failed");
         exit(EXIT_FAILURE);
     }
 
-    // Gắn socket vào port 8080
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(PORT);
